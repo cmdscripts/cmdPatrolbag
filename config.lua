@@ -64,7 +64,13 @@ Config.Text = {
     notFound = 'Nicht gefunden',
     removeFailed = 'Konnte nicht entfernt werden',
     bagInBag = 'Tasche-in-Tasche nicht erlaubt',
-    onlyOneBag = 'Nur eine Tasche erlaubt'
+    onlyOneBag = 'Nur eine Tasche erlaubt',
+    openError = 'Fehler beim Öffnen',
+    fillError = 'Fehler beim Füllen der Tasche',
+    updateError = 'Fehler beim Aktualisieren',
+    createError = 'Fehler beim Erstellen der Tasche',
+    notAvailable = 'Nicht verfügbar',
+    nothingAvailable = 'Nichts verfügbar'
 }
 
 Config.JobWhitelist = { 'police', 'ambulance' }
