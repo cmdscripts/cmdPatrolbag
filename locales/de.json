@@ -1,0 +1,36 @@
+{
+    "menu": {
+        "take": "Tasche entnehmen",
+        "return": "Tasche abgeben",
+        "interact": "Taschen"
+    },
+    "help": {
+        "interact": "[E] Taschen"
+    },
+    "notify": {
+        "title": "Taschen",
+        "no_access": "Kein Zugriff",
+        "rate_limited": "Nicht so schnell",
+        "already_have": "Du trägst diese Tasche bereits",
+        "no_space": "Kein Platz im Inventar",
+        "issued": "%s entnommen",
+        "returned": "%s abgegeben",
+        "not_found": "Tasche nicht gefunden",
+        "remove_failed": "Tasche konnte nicht entfernt werden",
+        "bag_in_bag": "Du kannst keine Tasche in eine Tasche legen",
+        "only_one_bag": "Du darfst davon nur eine tragen",
+        "open_error": "Fehler beim Öffnen der Tasche",
+        "fill_error": "Fehler beim Befüllen der Tasche",
+        "update_error": "Fehler beim Aktualisieren der Tasche",
+        "not_available": "Hier nicht verfügbar",
+        "nothing_available": "Nichts verfügbar"
+    },
+    "error": {
+        "no_framework": "Kein unterstütztes Framework gefunden (ESX oder qbx_core).",
+        "framework_init": "Framework \"%s\" erkannt, aber Initialisierung fehlgeschlagen.",
+        "unknown_bag": "Config.Points['%s'] verweist auf unbekannte Tasche '%s'.",
+        "invalid_model": "Modell '%s' existiert nicht (Punkt '%s') - nutze Marker.",
+        "invalid_anim": "Animation '%s' existiert nicht.",
+        "stash_limit": "Stash-Limit (%s) erreicht."
+    }
+}

@@ -1,39 +1,33 @@
+-- Copy these entries into ox_inventory/data/items.lua
+
 ['patrolbag'] = {
-    label = 'Patrolbag',
+    label = 'Patrol Bag',
     weight = 1000,
     stack = false,
     close = true,
-    client = {
-        event = 'cmd_patrolbag:clientUse'
-    }
+    client = { export = 'cmdPatrolbag.useBag' }
 },
 
-['firstaid'] = {
+['firstaid_bag'] = {
     label = 'First Aid Kit',
     weight = 800,
     stack = false,
     close = true,
-    client = {
-        event = 'cmd_patrolbag:clientUse'
-    }
+    client = { export = 'cmdPatrolbag.useBag' }
 },
 
-['manvbag'] = {
-    label = 'MANV Tasche',
+['manv'] = {
+    label = 'MANV Bag',
     weight = 1500,
     stack = false,
     close = true,
-    client = {
-        event = 'cmd_patrolbag:clientUse'
-    }
+    client = { export = 'cmdPatrolbag.useBag' }
 },
 
 ['kfz_kit'] = {
-    label = 'KFZ Verbandkasten',
+    label = 'Vehicle First Aid Kit',
     weight = 500,
     stack = false,
     close = true,
-    client = {
-        event = 'cmd_patrolbag:clientUse'
-    }
+    client = { export = 'cmdPatrolbag.useBag' }
 },

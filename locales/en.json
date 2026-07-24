@@ -1,0 +1,36 @@
+{
+    "menu": {
+        "take": "Take bag",
+        "return": "Return bag",
+        "interact": "Bags"
+    },
+    "help": {
+        "interact": "[E] Bags"
+    },
+    "notify": {
+        "title": "Bags",
+        "no_access": "No access",
+        "rate_limited": "Please slow down",
+        "already_have": "You already carry this bag",
+        "no_space": "No space in inventory",
+        "issued": "%s issued",
+        "returned": "%s returned",
+        "not_found": "Bag not found",
+        "remove_failed": "Bag could not be removed",
+        "bag_in_bag": "You cannot put a bag inside a bag",
+        "only_one_bag": "You may only carry one of these",
+        "open_error": "Error opening the bag",
+        "fill_error": "Error filling the bag",
+        "update_error": "Error updating the bag",
+        "not_available": "Not available here",
+        "nothing_available": "Nothing available"
+    },
+    "error": {
+        "no_framework": "No supported framework found (ESX or qbx_core).",
+        "framework_init": "Framework \"%s\" detected, but initialisation failed.",
+        "unknown_bag": "Config.Points['%s'] references unknown bag '%s'.",
+        "invalid_model": "Model '%s' does not exist (point '%s') - falling back to marker.",
+        "invalid_anim": "Animation dict '%s' does not exist.",
+        "stash_limit": "Stash limit (%s) reached."
+    }
+}
