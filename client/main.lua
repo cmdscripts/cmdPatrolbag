@@ -1,15 +1,9 @@
 local entities = {}
 
----@param message string
----@param type? string
 local function notify(message, type)
     lib.notify({ title = locale('notify.title'), description = message, type = type })
 end
 
---- Baut das Untermenue fuer eine Aktion und ruft den Server auf.
----@param point table
----@param action 'take' | 'open' | 'return'
----@param state table<string, boolean>
 local function openBagMenu(point, action, state)
     local options = {}
 
@@ -17,7 +11,6 @@ local function openBagMenu(point, action, state)
         local bag = Shared.getBag(bagKey)
         local owned = state[bagKey] == true
 
-        -- Entnehmen zeigt nur fehlende, Abgeben nur vorhandene Taschen.
         if bag and owned ~= (action == 'take') then
             options[#options + 1] = {
                 title = bag.label,
@@ -44,7 +37,6 @@ local function openBagMenu(point, action, state)
     lib.showContext('patrolbag_action')
 end
 
----@param point table
 local function openPointMenu(point)
     local data = lib.callback.await('cmdPatrolbag:getPoint', false, point.id)
 
@@ -76,8 +68,6 @@ local function openPointMenu(point)
     lib.showContext('patrolbag_main')
 end
 
----@param point table
----@return number? entity
 local function spawnEntity(point)
     local model = point.ped or point.prop
 
@@ -85,8 +75,6 @@ local function spawnEntity(point)
 
     local coords = point.coords
 
-    -- Ungueltiges Modell in der Config darf den Punkt nicht zerstoeren:
-    -- lib.requestModel wirft dann, der Punkt faellt auf Marker + [E] zurueck.
     if not pcall(lib.requestModel, model, 10000) then
         lib.print.error(locale('error.invalid_model', model, point.label))
         return
@@ -111,8 +99,6 @@ local function spawnEntity(point)
     return entity
 end
 
----@param point table
----@param entity number
 local function addTarget(point, entity)
     exports.ox_target:addLocalEntity(entity, {
         {
@@ -125,9 +111,6 @@ local function addTarget(point, entity)
     })
 end
 
---- Ohne Entity (reiner Marker-Punkt) bleibt nur die Marker-Interaktion,
---- auch wenn ox_target konfiguriert ist.
----@param point table
 local function setupPoint(point)
     local entity = spawnEntity(point)
 
@@ -141,8 +124,6 @@ local function setupPoint(point)
 
     local coords = vec3(point.coords.x, point.coords.y, point.coords.z)
 
-    -- Ped/Prop markiert den Punkt bereits sichtbar: dann kein Marker,
-    -- nur TextUI + [E].
     local marker = not entity and lib.marker.new({
         type = Shared.marker.type,
         width = Shared.marker.width,

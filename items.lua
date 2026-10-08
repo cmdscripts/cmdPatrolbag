@@ -1,5 +1,3 @@
--- Copy these entries into ox_inventory/data/items.lua
-
 ['patrolbag'] = {
     label = 'Patrol Bag',
     weight = 1000,

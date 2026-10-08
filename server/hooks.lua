@@ -1,7 +1,5 @@
 local ox = exports.ox_inventory
 
---- Alle Bag-Items als Filter fuer die Hooks: ox_inventory ruft sie damit
---- nur fuer diese Items auf, statt bei jeder Inventarbewegung im Server.
 local function getItemFilter()
     local filter = {}
 
@@ -12,7 +10,6 @@ local function getItemFilter()
     return filter
 end
 
---- Stash-Praefixe aller Taschen; identifiziert Tasche-in-Tasche-Ziele.
 local function getPrefixes()
     local prefixes = {}
 
@@ -33,8 +30,6 @@ CreateThread(function()
     local itemFilter = getItemFilter()
     local prefixes = getPrefixes()
 
-    -- Verhindert, dass eine Tasche in einer Tasche landet: das umgeht
-    -- Gewichtslimits und kann Inhalte unerreichbar machen.
     ox:registerHook('swapItems', function(payload)
         local target = payload.toInventory
 
@@ -50,9 +45,6 @@ CreateThread(function()
         return true
     end, { print = false, itemFilter = itemFilter })
 
-    -- Der Hook laeuft VOR der Bewegung: der Statebag wird danach neu gebaut,
-    -- damit das Trage-Prop verschwindet, sobald die Tasche z.B. im Kofferraum
-    -- landet (und beim Herausnehmen wieder erscheint).
     ox:registerHook('swapItems', function(payload)
         local fromPlayer = payload.fromType == 'player' and payload.fromInventory
         local toPlayer = payload.toType == 'player' and payload.toInventory
@@ -65,10 +57,6 @@ CreateThread(function()
         return true
     end, { print = false, itemFilter = itemFilter })
 
-    -- Zweite Tasche derselben Art entfernen, wenn onePerInventory gilt.
-    -- createItem wertet den Rueckgabewert nicht als Abbruch aus
-    -- (items/server.lua:232 nutzt nur hooks.result als Metadata), deshalb
-    -- wird die ueberzaehlige Tasche nach dem Erstellen wieder abgezogen.
     ox:registerHook('createItem', function(payload)
         local inventory = payload.inventoryId
 

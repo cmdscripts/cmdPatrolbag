@@ -78,9 +78,6 @@ function Bridge.getOwner(src)
     return active:getOwner(src) or false
 end
 
----@param src number
----@param jobs? table<string, number>
----@return boolean
 function Bridge.hasAccess(src, jobs)
     if not jobs or not next(jobs) then return true end
 
@@ -93,7 +90,6 @@ function Bridge.hasAccess(src, jobs)
     return required ~= nil and grade >= required
 end
 
----@param cb fun(src: number)
 function Bridge.onPlayerLoaded(cb)
     AddEventHandler('cmdPatrolbag:frameworkReady', function()
         active:onPlayerLoaded(cb)
@@ -101,7 +97,6 @@ function Bridge.onPlayerLoaded(cb)
 end
 
 CreateThread(function()
-    -- lib.waitFor wirft bei Timeout, statt nil zurueckzugeben.
     local ok, name = pcall(lib.waitFor, detect, 'framework', 10000)
 
     if not ok or not name then

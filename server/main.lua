@@ -4,15 +4,10 @@ local stashCount = 0
 local cooldowns = {}
 local attempts = {}
 
----@param src number
----@param message string
----@param type? 'inform' | 'error' | 'success'
 local function notify(src, message, type)
     TriggerClientEvent('cmdPatrolbag:notify', src, message, type or 'inform')
 end
 
----@param src number
----@return boolean blocked
 local function isRateLimited(src)
     local now = GetGameTimer()
     local last = cooldowns[src]
@@ -35,8 +30,6 @@ local function isRateLimited(src)
     return false
 end
 
----@param src number
----@return table<string, boolean>
 local function buildState(src)
     local state = {}
 
@@ -47,9 +40,6 @@ local function buildState(src)
     return state
 end
 
---- Repliziert, welche Taschen der Spieler traegt: die Clients haengen
---- daran die Trage-Props auf (client/carry.lua).
----@param src number
 function PushState(src)
     local player = Player(src)
 
@@ -60,9 +50,6 @@ end
 
 local pushState = PushState
 
----@param bag table
----@param identifier string
----@return string? stashId
 local function ensureStash(bag, identifier, owner)
     local stashId = bag.stashPrefix .. identifier
 
@@ -85,8 +72,6 @@ local function ensureStash(bag, identifier, owner)
     return stashId
 end
 
----@param stashId string
----@param bag table
 local function fillStash(stashId, bag)
     if not bag.items then return true end
 
@@ -97,20 +82,12 @@ local function fillStash(stashId, bag)
     end)
 end
 
----@param src number
----@param bag table
----@return table? slot
 local function findBagSlot(src, bag)
     local slots = ox:Search(src, 'slots', bag.item)
 
     return type(slots) == 'table' and slots[1] or nil
 end
 
---- Oeffnet die Tasche im Slot: erstellt Stash + Startinhalt beim ersten Mal.
----@param src number
----@param bag table
----@param slot table
----@return boolean
 local function openBagSlot(src, bag, slot)
     local metadata = slot.metadata or {}
 
@@ -147,9 +124,6 @@ local function openBagSlot(src, bag, slot)
     return true
 end
 
----@param src number
----@param bagKey string
----@return boolean
 local function issueBag(src, bagKey)
     local bag = Shared.getBag(bagKey)
 
@@ -171,9 +145,6 @@ local function issueBag(src, bagKey)
     return true
 end
 
----@param src number
----@param bagKey string
----@return boolean
 local function returnBag(src, bagKey)
     local bag = Shared.getBag(bagKey)
 
@@ -201,9 +172,6 @@ local function returnBag(src, bagKey)
     return true
 end
 
---- Punkt-Aktionen teilen sich Rate-Limit und Zugriffspruefung.
----@param handler fun(src: number, bagKey: string): boolean
----@return fun(src: number, pointId: string, bagKey: string): boolean
 local function pointAction(handler)
     return function(src, pointId, bagKey)
         if isRateLimited(src) then

@@ -13,8 +13,6 @@ local defaults = {
     jobCacheExpiry = 30000,
     maxStashes = 5000,
     identifierRange = { min = 10000, max = 99999 },
-    -- Linke Hand (SKEL_L_Hand): die rechte bleibt fuer die Waffe frei.
-    -- Werte aus dem 'dufbag'-Emote von scully_emotemenu.
     carry = {
         bone = 28422,
         offset = vec3(0.26, 0.04, 0.0),
@@ -38,12 +36,10 @@ Shared = setmetatable({}, {
     end
 })
 
--- 'ox_target' und 'target' meinen dasselbe.
 if config.interaction == 'ox_target' then
     config.interaction = 'target'
 end
 
--- Muss vor dem Aufbau der Punkte stehen: die nutzen bereits locale().
 LoadLocale(Shared.locale)
 
 local bags = {}
@@ -61,8 +57,6 @@ for key, bag in pairs(config.bags or {}) do
         onePerInventory = bag.onePerInventory ~= false,
         stashPrefix = ('%s%s_'):format(Shared.stashPrefix, key),
 
-        -- Prop am Spieler, solange die Tasche im Inventar liegt.
-        -- String = nur Modell, Tabelle = Modell + eigene Platzierung/Animation.
         carry = carry and {
             model = type(carry) == 'string' and carry or carry.model,
             bone = (type(carry) == 'table' and carry.bone) or Shared.carry.bone,
@@ -105,14 +99,10 @@ end
 
 Shared.points = points
 
----@param key string
----@return table?
 function Shared.getBag(key)
     return type(key) == 'string' and bags[key] or nil
 end
 
----@param id string
----@return table?
 function Shared.getPoint(id)
     if type(id) ~= 'string' then return end
 
@@ -121,9 +111,6 @@ function Shared.getPoint(id)
     end
 end
 
----@param point table
----@param bagKey string
----@return boolean
 function Shared.pointHasBag(point, bagKey)
     for i = 1, #point.bags do
         if point.bags[i] == bagKey then return true end

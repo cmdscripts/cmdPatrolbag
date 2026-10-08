@@ -1,11 +1,5 @@
---- Haengt getragene Taschen als Prop an den Ped. Quelle ist der replizierte
---- Statebag 'cmdPatrolbag', damit auch andere Spieler die Tasche sehen.
-
----@type table<number, table<string, number>>
 local attached = {}
 
----@param serverId number
----@param bagKey string
 local function detach(serverId, bagKey)
     local props = attached[serverId]
     local prop = props and props[bagKey]
@@ -23,7 +17,6 @@ local function detach(serverId, bagKey)
     end
 end
 
----@param serverId number
 local function detachAll(serverId)
     local props = attached[serverId]
 
@@ -34,10 +27,6 @@ local function detachAll(serverId)
     end
 end
 
----@param ped number
----@param serverId number
----@param bagKey string
----@param carry table
 local function attach(ped, serverId, bagKey, carry)
     if attached[serverId]?[bagKey] then return end
 
@@ -61,9 +50,6 @@ local function attach(ped, serverId, bagKey, carry)
     attached[serverId][bagKey] = prop
 end
 
---- Trage-Animation des eigenen Peds. Fremde Peds animiert deren Client
---- selbst, deshalb laeuft das nur lokal.
----@return table? carry
 local function getOwnCarryAnim()
     local state = LocalPlayer.state.cmdPatrolbag
 
@@ -74,8 +60,6 @@ local function getOwnCarryAnim()
     end
 end
 
---- Haelt die Trage-Animation am Leben: Waffe ziehen, Fahrzeuge und andere
---- Emotes brechen sie ab, danach muss sie neu gestartet werden.
 CreateThread(function()
     local playing
 
@@ -92,7 +76,6 @@ CreateThread(function()
             goto continue
         end
 
-        -- In Fahrzeugen und beim Schwimmen wuerde die Animation stoeren.
         if cache.vehicle or IsPedSwimming(cache.ped) or IsPedRagdoll(cache.ped) then
             playing = nil
             Wait(500)
@@ -101,7 +84,6 @@ CreateThread(function()
 
         if not IsEntityPlayingAnim(cache.ped, carry.dict, carry.anim, 3) then
             if pcall(lib.requestAnimDict, carry.dict, 5000) then
-                -- Flag 49 = loop + upper body only + allow player movement.
                 TaskPlayAnim(cache.ped, carry.dict, carry.anim, 3.0, 3.0, -1, 49, 0.0, false, false, false)
                 playing = carry
             else
@@ -116,9 +98,6 @@ CreateThread(function()
     end
 end)
 
---- Gleicht die Props eines Spielers mit seinem Statebag ab.
----@param serverId number
----@param state? table<string, boolean>
 local function refresh(serverId, state)
     local playerId = GetPlayerFromServerId(serverId)
 
@@ -144,12 +123,9 @@ AddStateBagChangeHandler('cmdPatrolbag', nil, function(bagName, _, value)
 
     if not serverId then return end
 
-    -- Der Ped existiert bei einem frisch gestreamten Spieler evtl. noch nicht.
     CreateThread(function() refresh(serverId, value) end)
 end)
 
---- Spieler, die erst spaeter in Streaming-Reichweite kommen, senden keinen
---- Statebag-Change: deren Zustand wird zyklisch nachgezogen.
 CreateThread(function()
     while true do
         Wait(2000)
@@ -167,7 +143,6 @@ CreateThread(function()
             end
         end
 
-        -- Props von Spielern entfernen, die ausser Reichweite sind.
         for serverId in pairs(attached) do
             if not active[serverId] then
                 detachAll(serverId)
