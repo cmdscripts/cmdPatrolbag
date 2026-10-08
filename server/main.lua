@@ -196,11 +196,16 @@ end
 local function isNearPoint(src, point)
     local ped = GetPlayerPed(src)
 
-    if not ped or ped == 0 then return false end
+    if not ped or ped == 0 then return GetConvar('onesync', 'off') == 'off' end
 
+    local coords = GetEntityCoords(ped)
+
+    if coords.x == 0.0 and coords.y == 0.0 and coords.z == 0.0 then return false end
+
+    local target = vec3(point.coords.x, point.coords.y, point.coords.z)
     local maxDistance = math.max(point.radius, 2.0) + Shared.interactTolerance
 
-    return #(GetEntityCoords(ped) - point.coords.xyz) <= maxDistance
+    return #(coords - target) <= maxDistance
 end
 
 local function pointAction(handler)

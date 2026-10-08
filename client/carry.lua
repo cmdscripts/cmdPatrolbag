@@ -1,5 +1,6 @@
 local attached = {}
 local pending = {}
+local wanted = {}
 
 local function detach(serverId, bagKey)
     local props = attached[serverId]
@@ -52,7 +53,7 @@ local function attach(ped, serverId, bagKey, carry)
         return lib.print.error(locale('error.invalid_model', carry.model, bagKey))
     end
 
-    local state = Player(serverId).state.cmdPatrolbag
+    local state = wanted[serverId]
 
     if not DoesEntityExist(ped) or type(state) ~= 'table' or not state[bagKey] then
         pending[lock] = nil
@@ -126,6 +127,8 @@ CreateThread(function()
 end)
 
 local function refresh(serverId, state)
+    wanted[serverId] = state
+
     local playerId = GetPlayerFromServerId(serverId)
 
     if playerId == -1 then return detachAll(serverId) end
@@ -173,6 +176,12 @@ CreateThread(function()
         for serverId in pairs(attached) do
             if not active[serverId] then
                 detachAll(serverId)
+            end
+        end
+
+        for serverId in pairs(wanted) do
+            if not active[serverId] then
+                wanted[serverId] = nil
             end
         end
     end
