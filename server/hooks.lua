@@ -67,9 +67,20 @@ CreateThread(function()
         for _, bag in pairs(Shared.bags) do
             if bag.item == itemName and bag.onePerInventory then
                 SetTimeout(0, function()
-                    if (ox:GetItemCount(inventory, bag.item) or 0) <= 1 then return end
+                    local slots = ox:Search(inventory, 'slots', bag.item)
 
-                    ox:RemoveItem(inventory, bag.item, 1)
+                    if type(slots) ~= 'table' or #slots <= 1 then return end
+
+                    local surplus = slots[#slots]
+
+                    for i = #slots, 1, -1 do
+                        if not slots[i].metadata?.identifier then
+                            surplus = slots[i]
+                            break
+                        end
+                    end
+
+                    ox:RemoveItem(inventory, bag.item, 1, nil, surplus.slot)
                     TriggerClientEvent('cmdPatrolbag:notify', inventory, locale('notify.only_one_bag'), 'error')
                 end)
 

@@ -105,7 +105,7 @@ local function addTarget(point, entity)
             name = 'patrolbag_' .. point.id,
             icon = 'fa-solid fa-briefcase',
             label = point.label,
-            distance = 2.0,
+            distance = point.radius,
             onSelect = function() openPointMenu(point) end,
         },
     })

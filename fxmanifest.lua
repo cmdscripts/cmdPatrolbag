@@ -4,7 +4,7 @@ lua54 'yes'
 
 author 'cmdscripts'
 description 'Server-authoritative multi-bag system for ESX and QBox'
-version '2.0.0'
+version '2.1.0'
 
 shared_scripts {
     '@ox_lib/init.lua',

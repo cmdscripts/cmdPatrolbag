@@ -50,15 +50,33 @@ end
 
 local pushState = PushState
 
-local function ensureStash(bag, identifier, owner)
-    local stashId = bag.stashPrefix .. identifier
+local freeStashes = {}
 
-    if registered[stashId] then return stashId end
+local function claimIdentifier(bag)
+    local pool = freeStashes[bag.key]
+    local entry = pool and table.remove(pool)
+
+    if entry then return entry.identifier, entry.owner end
 
     if stashCount >= Shared.maxStashes then
         lib.print.error(locale('error.stash_limit', Shared.maxStashes))
         return
     end
+
+    return ('PBG-%s'):format(lib.string.random('AAAA1111AA'))
+end
+
+local function releaseIdentifier(bag, metadata)
+    if not metadata.identifier or not registered[metadata.stashId] then return end
+
+    freeStashes[bag.key] = freeStashes[bag.key] or {}
+    table.insert(freeStashes[bag.key], { identifier = metadata.identifier, owner = metadata.owner })
+end
+
+local function ensureStash(bag, identifier, owner)
+    local stashId = bag.stashPrefix .. identifier
+
+    if registered[stashId] then return stashId end
 
     local ok = pcall(function()
         ox:RegisterStash(stashId, ('%s [%s]'):format(bag.label, identifier), bag.slots, bag.weight, owner)
@@ -92,10 +110,12 @@ local function openBagSlot(src, bag, slot)
     local metadata = slot.metadata or {}
 
     if not metadata.identifier then
-        metadata.identifier = ('PBG-%s'):format(lib.string.random('AAAA1111AA'))
+        metadata.identifier, metadata.owner = claimIdentifier(bag)
     end
 
-    local stashId = ensureStash(bag, metadata.identifier, Bridge.getOwner(src))
+    metadata.owner = metadata.owner or Bridge.getOwner(src)
+
+    local stashId = metadata.identifier and ensureStash(bag, metadata.identifier, metadata.owner)
 
     if not stashId then
         notify(src, locale('notify.open_error'), 'error')
@@ -157,14 +177,15 @@ local function returnBag(src, bagKey)
         return false
     end
 
-    local stashId = slot.metadata?.stashId
-
-    if stashId then pcall(ox.ClearInventory, ox, stashId) end
+    local metadata = slot.metadata or {}
+    local cleared = metadata.stashId and pcall(ox.ClearInventory, ox, metadata.stashId)
 
     if not ox:RemoveItem(src, bag.item, 1, nil, slot.slot) then
         notify(src, locale('notify.remove_failed'), 'error')
         return false
     end
+
+    if cleared then releaseIdentifier(bag, metadata) end
 
     pushState(src)
     notify(src, locale('notify.returned', bag.label), 'success')
