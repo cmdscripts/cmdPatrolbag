@@ -92,7 +92,7 @@ local function openBagSlot(src, bag, slot)
     local metadata = slot.metadata or {}
 
     if not metadata.identifier then
-        metadata.identifier = ('PBG-%d'):format(math.random(Shared.identifierRange.min, Shared.identifierRange.max))
+        metadata.identifier = ('PBG-%s'):format(lib.string.random('AAAA1111AA'))
     end
 
     local stashId = ensureStash(bag, metadata.identifier, Bridge.getOwner(src))
@@ -172,6 +172,16 @@ local function returnBag(src, bagKey)
     return true
 end
 
+local function isNearPoint(src, point)
+    local ped = GetPlayerPed(src)
+
+    if not ped or ped == 0 then return false end
+
+    local maxDistance = math.max(point.radius, 2.0) + Shared.interactTolerance
+
+    return #(GetEntityCoords(ped) - point.coords.xyz) <= maxDistance
+end
+
 local function pointAction(handler)
     return function(src, pointId, bagKey)
         if isRateLimited(src) then
@@ -183,6 +193,11 @@ local function pointAction(handler)
 
         if not point or not Bridge.hasAccess(src, point.jobs) then
             notify(src, locale('notify.no_access'), 'error')
+            return false
+        end
+
+        if not isNearPoint(src, point) then
+            notify(src, locale('notify.too_far'), 'error')
             return false
         end
 
@@ -230,8 +245,26 @@ RegisterNetEvent('cmdPatrolbag:useItem', function(slotId)
     if bag then openBagSlot(src, bag, slot) end
 end)
 
+local syncRequests = {}
+
+RegisterNetEvent('cmdPatrolbag:syncState', function()
+    local src = source
+    local now = GetGameTimer()
+
+    if syncRequests[src] and now - syncRequests[src] < 250 then return end
+
+    syncRequests[src] = now
+    pushState(src)
+end)
+
 Bridge.onPlayerLoaded(function(src)
     SetTimeout(1500, function() pushState(src) end)
+end)
+
+AddEventHandler('cmdPatrolbag:frameworkReady', function()
+    for _, playerId in ipairs(GetPlayers()) do
+        pushState(tonumber(playerId))
+    end
 end)
 
 AddEventHandler('playerDropped', function()
@@ -239,4 +272,5 @@ AddEventHandler('playerDropped', function()
 
     cooldowns[src] = nil
     attempts[src] = nil
+    syncRequests[src] = nil
 end)

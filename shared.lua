@@ -12,7 +12,7 @@ local defaults = {
     maxActionsPerMinute = 30,
     jobCacheExpiry = 30000,
     maxStashes = 5000,
-    identifierRange = { min = 10000, max = 99999 },
+    interactTolerance = 3.0,
     carry = {
         bone = 28422,
         offset = vec3(0.26, 0.04, 0.0),

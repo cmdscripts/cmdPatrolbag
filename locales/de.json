@@ -23,7 +23,8 @@
         "fill_error": "Fehler beim Befüllen der Tasche",
         "update_error": "Fehler beim Aktualisieren der Tasche",
         "not_available": "Hier nicht verfügbar",
-        "nothing_available": "Nichts verfügbar"
+        "nothing_available": "Nichts verfügbar",
+        "too_far": "Du bist zu weit entfernt"
     },
     "error": {
         "no_framework": "Kein unterstütztes Framework gefunden (ESX oder qbx_core).",

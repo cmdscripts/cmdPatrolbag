@@ -40,11 +40,11 @@ end
 local function openPointMenu(point)
     local data = lib.callback.await('cmdPatrolbag:getPoint', false, point.id)
 
-    if not data then return end
-
     if data == false then
         return notify(locale('notify.no_access'), 'error')
     end
+
+    if not data then return end
 
     local actions = {
         { action = 'take', icon = 'plus' },

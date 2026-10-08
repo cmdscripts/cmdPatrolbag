@@ -1,13 +1,14 @@
 local attached = {}
+local pending = {}
 
 local function detach(serverId, bagKey)
     local props = attached[serverId]
-    local prop = props and props[bagKey]
+    local entry = props and props[bagKey]
 
-    if not prop then return end
+    if not entry then return end
 
-    if DoesEntityExist(prop) then
-        DeleteEntity(prop)
+    if DoesEntityExist(entry.prop) then
+        DeleteEntity(entry.prop)
     end
 
     props[bagKey] = nil
@@ -27,17 +28,43 @@ local function detachAll(serverId)
     end
 end
 
+local function isAttached(serverId, bagKey, ped)
+    local entry = attached[serverId]?[bagKey]
+
+    return entry ~= nil
+        and entry.ped == ped
+        and DoesEntityExist(entry.prop)
+        and IsEntityAttachedToEntity(entry.prop, ped)
+end
+
 local function attach(ped, serverId, bagKey, carry)
-    if attached[serverId]?[bagKey] then return end
+    if isAttached(serverId, bagKey, ped) then return end
+
+    local lock = ('%s:%s'):format(serverId, bagKey)
+
+    if pending[lock] then return end
+
+    pending[lock] = true
+    detach(serverId, bagKey)
 
     if not pcall(lib.requestModel, carry.model, 5000) then
+        pending[lock] = nil
         return lib.print.error(locale('error.invalid_model', carry.model, bagKey))
+    end
+
+    local state = Player(serverId).state.cmdPatrolbag
+
+    if not DoesEntityExist(ped) or type(state) ~= 'table' or not state[bagKey] then
+        pending[lock] = nil
+        SetModelAsNoLongerNeeded(carry.model)
+        return
     end
 
     local coords = GetEntityCoords(ped)
     local prop = CreateObject(carry.model, coords.x, coords.y, coords.z, false, false, false)
 
     SetModelAsNoLongerNeeded(carry.model)
+    pending[lock] = nil
 
     if not DoesEntityExist(prop) then return end
 
@@ -47,7 +74,7 @@ local function attach(ped, serverId, bagKey, carry)
         true, true, false, true, 1, true)
 
     attached[serverId] = attached[serverId] or {}
-    attached[serverId][bagKey] = prop
+    attached[serverId][bagKey] = { prop = prop, ped = ped }
 end
 
 local function getOwnCarryAnim()
@@ -148,6 +175,18 @@ CreateThread(function()
                 detachAll(serverId)
             end
         end
+    end
+end)
+
+local bagItems = {}
+
+for _, bag in pairs(Shared.bags) do
+    bagItems[bag.item] = true
+end
+
+AddEventHandler('ox_inventory:itemCount', function(itemName)
+    if bagItems[itemName] then
+        TriggerServerEvent('cmdPatrolbag:syncState')
     end
 end)
 

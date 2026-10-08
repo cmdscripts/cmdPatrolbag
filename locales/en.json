@@ -23,7 +23,8 @@
         "fill_error": "Error filling the bag",
         "update_error": "Error updating the bag",
         "not_available": "Not available here",
-        "nothing_available": "Nothing available"
+        "nothing_available": "Nothing available",
+        "too_far": "You are too far away"
     },
     "error": {
         "no_framework": "No supported framework found (ESX or qbx_core).",
